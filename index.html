@@ -1,0 +1,215 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Online Retail: From Raw Transactions to Business Intelligence</title>
+<style>
+/* One colour: navy on white. Put the logo in logo.svg (or logo.png) next to this file. */
+:root{--paper:#fff;--ink:#0B1F4B;--mute:rgba(11,31,75,.62);--rule:rgba(11,31,75,.16);--soft:rgba(11,31,75,.06);--f:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif}
+*{box-sizing:border-box}html,body{height:100%;margin:0}
+body{background:var(--paper);color:var(--ink);font:400 1rem/1.45 var(--f);overflow:hidden;font-variant-numeric:tabular-nums}
+.slide{position:absolute;inset:0;padding:88px 6vw 64px;overflow-y:auto;opacity:0;visibility:hidden;transition:opacity .25s,visibility .25s}
+.slide.on{opacity:1;visibility:visible}
+.in{max-width:1180px;margin:0 auto;min-height:100%;display:flex;flex-direction:column;justify-content:center;gap:1.5rem}
+h1,h2{font-weight:600;margin:0}h2{font-size:clamp(1.7rem,3.2vw,2.6rem);line-height:1.15;max-width:22em}
+h3{font-size:.95rem;font-weight:600;margin:0 0 .6rem}
+.cap{color:var(--mute);font-size:1rem;max-width:44em;margin:0}.cap b{color:var(--ink)}.fine{font-size:.8rem;color:var(--mute)}
+.cols{display:grid;grid-template-columns:1fr 1fr;gap:3rem;align-items:start}.cols.w{grid-template-columns:1.25fr 1fr}
+.big{font-size:clamp(2.2rem,4.6vw,3.8rem);font-weight:600;line-height:1}
+.grid{display:grid;grid-template-columns:repeat(var(--n,4),1fr);gap:2rem}.grid>div{border-top:2px solid var(--ink);padding-top:.7rem}
+.grid span{display:block;color:var(--mute);margin-top:.4rem;font-size:.95rem}
+.rows .r{display:grid;grid-template-columns:minmax(120px,36%) 1fr auto;gap:.8rem;align-items:center;padding:.34rem 0;border-bottom:1px solid var(--rule);font-size:.95rem}
+.rows .b{height:.95rem;position:relative}.rows .b i{position:absolute;top:0;bottom:0;background:var(--ink);opacity:.3}
+.rows .hi i{opacity:1}.rows .neg i{opacity:1;background:repeating-linear-gradient(45deg,var(--ink) 0 2px,#fff 2px 5px);border:1px solid var(--ink)}
+.rows .l{overflow:hidden;text-overflow:ellipsis;white-space:nowrap}.rows .v{text-align:right;min-width:5.6em;font-weight:600}.rows .r:hover{background:var(--soft)}
+.stk{display:flex;height:54px;border:1px solid var(--ink)}.stk>div{height:100%}.a{background:var(--ink)}.bb{background:rgba(11,31,75,.3)}.cc{background:#fff}.hh{background:repeating-linear-gradient(45deg,var(--ink) 0 2px,#fff 2px 5px)}
+.lg{display:flex;flex-wrap:wrap;gap:.4rem 1.6rem;margin-top:.7rem;font-size:.95rem}.lg b{display:inline-block;width:.9rem;height:.9rem;border:1px solid var(--ink);margin-right:.4rem;vertical-align:-2px}
+.wf{display:grid;grid-template-columns:repeat(10,1fr);gap:4px;width:min(100%,300px)}.wf i{aspect-ratio:1;border:1px solid var(--ink)}.wf i.f{background:var(--ink)}
+svg{width:100%;height:auto;display:block}svg text{font:12px var(--f);fill:var(--mute)}svg .t{fill:var(--ink);font-weight:600}svg .g{stroke:var(--rule)}
+svg .ln{fill:none;stroke:var(--ink);stroke-width:2.5}svg circle{fill:#fff;stroke:var(--ink);stroke-width:2;cursor:pointer}svg circle:hover{fill:var(--ink)}
+ol.rec{list-style:none;margin:0;padding:0;counter-reset:c}ol.rec li{counter-increment:c;position:relative;border-top:1px solid var(--rule);padding:.8rem 0 .8rem 2.4rem;font-size:1.1rem}
+ol.rec li::before{content:counter(c);position:absolute;left:0;font-weight:600}ol.rec span{display:block;color:var(--mute);font-size:.92rem}
+.flow{display:grid;grid-template-columns:repeat(3,1fr);gap:2rem}.flow>div{border:1px solid var(--ink);padding:1.2rem}.flow span{display:block;color:var(--mute);margin-top:.5rem;font-size:.95rem}
+#hd,#ft{position:fixed;left:0;right:0;z-index:5;display:flex;justify-content:space-between;align-items:center;padding:0 6vw;font-size:.8rem;color:var(--mute);background:#fff}
+#hd{top:0;height:64px;border-bottom:1px solid var(--rule)}#ft{bottom:0;height:46px;border-top:1px solid var(--rule)}
+button{font:inherit;color:inherit;background:none;border:0;cursor:pointer;padding:.3rem .5rem}button:hover{color:var(--ink);text-decoration:underline}
+button:focus-visible,a:focus-visible{outline:2px solid var(--ink);outline-offset:2px}
+#bar{position:fixed;top:0;left:0;height:3px;background:var(--ink);width:0;z-index:7;transition:width .3s}
+#toc{position:fixed;top:64px;bottom:46px;left:0;width:min(340px,86vw);background:#fff;border-right:1px solid var(--rule);z-index:6;padding:1rem 1.4rem;overflow:auto;transform:translateX(-101%);transition:transform .25s}
+#toc.open{transform:none}#toc a{display:flex;gap:.8rem;padding:.45rem 0;border-bottom:1px solid var(--rule);color:var(--ink);text-decoration:none;font-size:.9rem}#toc a span{color:var(--mute);min-width:1.6rem}#toc a.cur{font-weight:600}
+#tip{position:fixed;pointer-events:none;background:var(--ink);color:#fff;font-size:.8rem;padding:.4rem .6rem;max-width:260px;display:none;z-index:9}
+#logo{position:fixed;top:12px;right:6vw;width:132px;height:40px;z-index:8;display:flex;align-items:center;justify-content:flex-end}
+#logo img{width:100%;height:100%;object-fit:contain;object-position:right center}#logo.ph{border:1px dashed var(--mute);justify-content:center;color:var(--mute);font-size:.75rem}#logo.ph::after{content:"Logo"}
+.cover h1{font-size:clamp(3rem,9vw,7rem);line-height:.95}
+@media(max-width:820px){.slide{padding:84px 5vw 60px}.cols,.cols.w{display:block}.cols>*{margin-bottom:1.6rem}.grid{grid-template-columns:1fr 1fr}.flow{grid-template-columns:1fr}#hd span{display:none}#logo{width:96px}.rows .r{grid-template-columns:minmax(90px,40%) 1fr auto}}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+@media print{@page{size:297mm 210mm;margin:0}html,body{height:auto;overflow:visible}body{font-size:12px;-webkit-print-color-adjust:exact;print-color-adjust:exact}
+#hd,#ft,#bar,#toc,#tip{display:none!important}#logo{top:9mm;right:16mm}#logo.ph{border-color:transparent}#logo.ph::after{content:""}
+.slide{position:relative;inset:auto;opacity:1!important;visibility:visible!important;width:297mm;height:210mm;padding:26mm 16mm 14mm;overflow:hidden;page-break-after:always;break-after:page}.in{min-height:0;height:100%}}
+</style>
+</head>
+<body>
+<div id="bar"></div>
+<div id="logo"><img src="logo.svg" alt="Logo" onerror="if(!this.dataset.t){this.dataset.t=1;this.src='logo.png'}else{this.parentNode.classList.add('ph');this.remove()}"></div>
+<header id="hd"><span>Online Retail · From Raw Transactions to Business Intelligence</span></header>
+<nav id="toc" aria-label="Contents"></nav><div id="tip"></div>
+<main>
+
+<section class="slide" data-t="Opening"><div class="in cover">
+<h1>Online Retail</h1>
+<p style="font-size:1.6rem;margin:0">From Raw Transactions to Business Intelligence</p>
+<p class="cap" style="font-size:1.2rem">Which products, countries, months and customers bring in the money, and can we trust the raw data?</p>
+<p class="fine">Source: Online Retail dataset, Kaggle. All figures come from the analysis notebook.</p>
+</div></section>
+
+<section class="slide" data-t="The data"><div class="in">
+<h2>One year of sales: 541,909 invoice lines</h2>
+<div class="grid"><div><b class="big">25,900</b><span>invoices</span></div><div><b class="big">4,372</b><span>customers</span></div><div><b class="big">4,070</b><span>products and codes</span></div><div><b class="big">38</b><span>countries</span></div></div>
+<div><h3>Where the lines come from</h3><div class="stk" id="ukrows"></div><div class="lg" id="ukrows_l"></div></div>
+<p class="cap">Each line is one item on one invoice. Data runs from 1 Dec 2010 to about 9 Dec 2011.</p>
+</div></section>
+
+<section class="slide" data-t="Data quality"><div class="in">
+<h2>One in four lines has no customer ID</h2>
+<div class="cols"><div><h3>Of every 100 lines, 25 have no customer ID</h3><div class="wf" id="w1"></div></div>
+<div><h3>Share of raw lines affected</h3><div class="rows" id="prob"></div></div></div>
+<p class="cap">These lines still count for sales, products, countries and months. They are left out only when looking at individual customers.</p>
+</div></section>
+
+<section class="slide" data-t="Cleaning"><div class="in">
+<h2>I removed only what was clearly repeated</h2>
+<div class="flow"><div><b class="big">5,268</b><span><b>Removed.</b> Exact duplicate lines. 541,909 lines became 536,641.</span></div>
+<div><b class="big">1,342</b><span><b>Fixed.</b> Missing product names, filled in from the same product elsewhere. 112 remain blank.</span></div>
+<div><b class="big">9,251</b><span><b>Kept and marked.</b> Cancelled lines, so returns count against revenue. Odd prices were also kept and marked.</span></div></div>
+</div></section>
+
+<section class="slide" data-t="Revenue"><div class="in">
+<h2>10.64M of sales became 9.73M of net revenue</h2>
+<div id="wfall"></div>
+<p class="cap"><b>Cancellations take back 8.4% of sales.</b> The small last step is two accounting entries labelled "Adjust bad debt".</p>
+</div></section>
+
+<section class="slide" data-t="Products"><div class="in">
+<h2>Best sellers by volume are not always the biggest earners</h2>
+<div class="cols"><div><h3>Most units sold</h3><div class="rows" id="pq"></div></div><div><h3>Most revenue</h3><div class="rows" id="pr"></div></div></div>
+<p class="cap"><b>Only 5 products appear in both top 10 lists</b> (solid bars). These counts are sales before returns.</p>
+</div></section>
+
+<section class="slide" data-t="Products"><div class="in">
+<h2>Nearly a third of the top earners are not products</h2>
+<div><div class="stk" id="fee"></div><div class="lg" id="fee_l"></div></div>
+<p class="cap">Postage and manual entries rank among the top 10 "products". The top real product is the Regency Cakestand 3 Tier at 174,157.</p>
+</div></section>
+
+<section class="slide" data-t="Returns"><div class="in">
+<h2>Cancellations are few lines, but many invoices</h2>
+<div class="cols"><div><h3>Of every 100 invoices, about 15 are cancellations</h3><div class="wf" id="w2"></div></div>
+<div><h3>Share affected</h3><div class="rows" id="canc"></div><p class="cap" style="margin-top:1rem">3,836 of 25,900 invoices are cancellations, but only 1.7% of lines.</p></div></div>
+</div></section>
+
+<section class="slide" data-t="Returns"><div class="in">
+<h2>Two top sellers were almost entirely sent back</h2>
+<div class="cols"><div><h3>Paper craft, little birdie</h3><div class="rows" id="s1"></div></div><div><h3>Medium ceramic top storage jar</h3><div class="rows" id="s2"></div></div></div>
+<p class="cap">Units sold and units returned are nearly equal. This looks like large orders that were reversed, so these two products overstate real demand.</p>
+</div></section>
+
+<section class="slide" data-t="Invoices"><div class="in">
+<h2>A few invoices are far larger than the rest</h2>
+<div class="rows" id="inv"></div>
+<p class="cap">Solid bars are invoices with a single product. <b>99% of invoices are below 4,107.</b></p>
+</div></section>
+
+<section class="slide" data-t="Countries"><div class="in">
+<h2>The United Kingdom is 85% of sales</h2>
+<div><div class="stk" id="ukrev"></div><div class="lg" id="ukrev_l"></div></div>
+<div><h3>The next nine countries</h3><div class="rows" id="cty"></div></div>
+</div></section>
+
+<section class="slide" data-t="Time"><div class="in">
+<h2>Revenue climbed from September to November</h2>
+<div id="line"></div>
+<p class="cap"><b>November 2011 was the peak at 1.46M.</b> September to November made up 36% of the year. December 2011 looks low only because the data ends around 9 December. One year is not enough to call it seasonal.</p>
+</div></section>
+
+<section class="slide" data-t="Customers"><div class="in">
+<h2>Top customers buy in two different ways</h2>
+<div class="cols w"><div><h3>Top 10 customers by total spend</h3><div class="rows" id="cus"></div></div><div><h3>How often vs how much per order</h3><div id="sc"></div></div></div>
+<p class="cap">The top 10 customers bring in 14% of net revenue. Some order often in small baskets, others rarely in large ones.</p>
+</div></section>
+
+<section class="slide" data-t="Takeaways"><div class="in">
+<h2>Five things to remember</h2>
+<div class="grid" style="--n:5"><div><b class="big">85%</b><span>of sales come from the UK</span></div><div><b class="big">5 / 10</b><span>top sellers are also top earners</span></div><div><b class="big">15%</b><span>of invoices are cancellations</span></div><div><b class="big">1.46M</b><span>revenue in November, the peak</span></div><div><b class="big">25%</b><span>of lines have no customer ID</span></div></div>
+</div></section>
+
+<section class="slide" data-t="Recommendations"><div class="in">
+<h2>What I would do next</h2>
+<ol class="rec"><li>Report products without postage and manual entries<span>They distort the rankings.</span></li>
+<li>Count returns against products<span>Rankings should show sales after returns.</span></li>
+<li>Check the autumn peak against a second year<span>One year cannot show a pattern.</span></li>
+<li>Treat frequent and big-basket customers differently<span>They buy in different ways.</span></li>
+<li>Find out why 25% of lines have no customer ID<span>It limits what we can learn about customers.</span></li></ol>
+<p class="fine">Proposals from this analysis. None have been put into practice.</p>
+</div></section>
+
+<section class="slide" data-t="Closing"><div class="in">
+<h2>Cleaning the data changed the story</h2>
+<p class="cap" style="font-size:1.2rem">At face value, the top product is postage and a top seller is a reversed order. Checking first gave a more reliable picture.</p>
+<p class="fine">Notes on the data: country invoice counts in the notebook are unreliable, so only country revenue is shown. December 2011 is a partial month. Product rankings are before returns. Interpretations here are mine and not proven by the data.</p>
+</div></section>
+</main>
+<footer id="ft"><button id="tb" aria-expanded="false">Contents</button><span><button id="pv" aria-label="Previous slide">Previous</button> <span id="ct"></span> <button id="nx" aria-label="Next slide">Next</button></span></footer>
+<script>
+(function(){
+var $=function(i){return document.getElementById(i)},f=function(v,d){return v.toLocaleString('en-GB',{minimumFractionDigits:d||0,maximumFractionDigits:d||0})};
+function rows(id,d,o){o=o||{};var mx=o.max||Math.max.apply(null,d.map(function(x){return Math.abs(x.v)}));
+$(id).innerHTML=d.map(function(x){var F=o.f||f;return '<div class="r '+(x.k||'')+'" data-tip="'+(x.t||x.l+': '+F(x.v))+'"><span class="l">'+x.l+'</span><span class="b"><i style="left:0;width:'+Math.abs(x.v)/mx*100+'%"></i></span><span class="v">'+F(x.v)+'</span></div>'}).join('')}
+function stack(id,p){var s=p.reduce(function(a,x){return a+x.v},0);$(id).innerHTML=p.map(function(x){return '<div class="'+x.c+'" style="width:'+x.v/s*100+'%" data-tip="'+x.l+': '+x.s+'"></div>'}).join('');
+$(id+'_l').innerHTML=p.map(function(x){return '<span><b class="'+x.c+'"></b>'+x.l+' <strong>'+x.s+'</strong></span>'}).join('')}
+function waffle(id,n){var h='';for(var i=0;i<100;i++)h+='<i class="'+(i<n?'f':'')+'"></i>';$(id).innerHTML=h}
+var pc=function(v){return v.toFixed(v<10?2:1)+'%'},m2=function(v){return f(v,2)};
+stack('ukrows',[{l:'United Kingdom',v:495478,c:'a',s:'91.4%'},{l:'Other 37 countries',v:46431,c:'bb',s:'8.6%'}]);
+waffle('w1',25);waffle('w2',15);
+rows('prob',[{l:'No customer ID',v:24.93},{l:'Cancelled lines',v:1.71},{l:'Exact duplicates',v:.97},{l:'Zero price',v:.46},{l:'No description',v:.27}],{f:pc,max:30});
+rows('canc',[{l:'Share of invoices',v:14.81},{l:'Share of lines',v:1.71}],{f:pc,max:30});
+// waterfall
+(function(){var W=900,H=320,L=10,B=40,T=30,mx=11e6,y=function(v){return T+(H-T-B)*(1-v/mx)},bw=130,xs=[60,290,520,750];
+var d=[['Gross sales',0,10642110.8,'a'],['Cancellations',9748131.07,10642110.8,'hh'],['Accounting entries',9726006.95,9748131.07,'hh'],['Net revenue',0,9726006.95,'a']],lab=['10.64M','−0.89M','−0.02M','9.73M'],tip=['Gross sales 10,642,110.80','Cancellations −893,979.73','Bad-debt entries −22,124.12 (derived)','Net revenue 9,726,006.95'];
+var s='<svg viewBox="0 0 '+W+' '+H+'"><line class="g" x1="0" x2="'+W+'" y1="'+y(0)+'" y2="'+y(0)+'"/>';
+d.forEach(function(r,i){var t=y(r[2]),h=Math.max(y(r[1])-t,2.5),fill=r[3]=='a'?'#0B1F4B':'url(#h)';
+s+='<rect x="'+xs[i]+'" y="'+t+'" width="'+bw+'" height="'+h+'" fill="'+fill+'" stroke="#0B1F4B" data-tip="'+tip[i]+'"/><text class="t" x="'+(xs[i]+bw/2)+'" y="'+(t-8)+'" text-anchor="middle" style="font-size:16px">'+lab[i]+'</text><text x="'+(xs[i]+bw/2)+'" y="'+(H-14)+'" text-anchor="middle" style="font-size:13px">'+r[0]+'</text>'});
+s+='<defs><pattern id="h" width="6" height="6" patternUnits="userSpaceOnUse" patternTransform="rotate(45)"><rect width="6" height="6" fill="#fff"/><rect width="2" height="6" fill="#0B1F4B"/></pattern></defs></svg>';$('wfall').innerHTML=s})();
+var both=['23843','23166','85099B','85123A','23084'];
+rows('pq',[['Paper craft, little birdie',80995,'23843'],['Medium ceramic top storage jar',78033,'23166'],['World War 2 gliders',54951,'84077'],['Jumbo bag red retrospot',48375,'85099B'],['White hanging heart holder',37584,'85123A'],['Popcorn holder',36749,'22197'],['Retrospot cake cases (72)',36396,'21212'],['Colour bird ornament',36362,'84879'],['Rabbit night light',31555,'23084'],['Mini paint set vintage',26633,'22492']].map(function(x){return{l:x[0],v:x[1],k:both.indexOf(x[2])>-1?'hi':''}}));
+rows('pr',[['Dotcom postage',206248.77,'DOT'],['Regency cakestand 3 tier',174156.54,'22423'],['Paper craft, little birdie',168469.60,'23843'],['White hanging heart holder',104462.75,'85123A'],['Party bunting',99445.23,'47566'],['Jumbo bag red retrospot',94159.81,'85099B'],['Medium ceramic storage jar',81700.92,'23166'],['Postage',78101.88,'POST'],['Manual',77750.27,'M'],['Rabbit night light',66870.03,'23084']].map(function(x){return{l:x[0],v:x[1],k:both.indexOf(x[2])>-1?'hi':''}}),{f:function(v){return f(v)}});
+stack('fee',[{l:'Real products',v:789264.88,c:'a',s:'68.6% · 789,265'},{l:'Postage and manual entries',v:362100.92,c:'hh',s:'31.4% · 362,101'}]);
+rows('s1',[{l:'Sold',v:80995,k:'hi'},{l:'Returned',v:80995,k:'neg'}],{max:82000});rows('s2',[{l:'Sold',v:78033,k:'hi'},{l:'Returned',v:74494,k:'neg'}],{max:82000});
+rows('inv',[['581483 · 1 product',168469.60],['541431 · 1 product',77183.60],['574941 · 101 products',52940.94],['576365 · 99 products',50653.91],['556444 · 1 product',38970.00],['567423 · 12 products',31698.16],['556917 · 138 products',22775.93],['572209 · 7 products',22206.00],['567381 · 12 products',22104.80],['563614 · 97 products',21880.44]].map(function(x,i){return{l:'Invoice '+x[0],v:x[1],k:[0,1,4].indexOf(i)>-1?'hi':''}}),{f:function(v){return f(v)}});
+stack('ukrev',[{l:'United Kingdom',v:8979619.97,c:'a',s:'84.6%'},{l:'Next four',v:1006890.63,c:'bb',s:'9.5%'},{l:'Other 33 countries',v:633476.08,c:'cc',s:'6.0%'}]);
+rows('cty',[['Netherlands',285446.34],['EIRE (Ireland)',283140.52],['Germany',228678.40],['France',209625.37],['Australia',138453.81],['Spain',61558.56],['Switzerland',57067.60],['Belgium',41196.34],['Sweden',38367.83]].map(function(x){return{l:x[0],v:x[1]}}),{f:function(v){return f(v)}});
+rows('cus',[[14646,279489.02,77],[18102,256438.49,62],[17450,187322.17,55],[14911,132458.73,248],[12415,123725.45,26],[14156,113214.59,66],[17511,88125.38,46],[16684,65892.08,31],[13694,62690.54,60],[15311,59284.19,118]].map(function(x){return{l:'Customer '+x[0],v:x[1],t:'Customer '+x[0]+': '+m2(x[1])+' over '+x[2]+' invoices'}}),{f:function(v){return f(v)}});
+(function(){var P=[[14646,77,3629.73],[18102,62,4136.10],[17450,55,3405.86],[14911,248,534.11],[12415,26,4758.67],[14156,66,1715.37],[17511,46,1915.77],[16684,31,2125.55],[13694,60,1044.84],[15311,118,502.41]],W=520,H=380,L=56,B=44,x=function(v){return L+v/270*(W-L-10)},y=function(v){return 12+(H-12-B)*(1-v/5000)};
+var s='<svg viewBox="0 0 '+W+' '+H+'">';[0,1000,2000,3000,4000,5000].forEach(function(v){s+='<line class="g" x1="'+L+'" x2="'+(W-8)+'" y1="'+y(v)+'" y2="'+y(v)+'"/><text x="'+(L-8)+'" y="'+(y(v)+4)+'" text-anchor="end">'+f(v)+'</text>'});
+[0,50,100,150,200,250].forEach(function(v){s+='<text x="'+x(v)+'" y="'+(H-24)+'" text-anchor="middle">'+v+'</text>'});
+P.forEach(function(p){s+='<circle cx="'+x(p[1])+'" cy="'+y(p[2])+'" r="6" data-tip="Customer '+p[0]+': '+p[1]+' invoices, average '+f(p[2],2)+' per invoice"/><text x="'+(x(p[1])+9)+'" y="'+(y(p[2])+4)+'">'+p[0]+'</text>'});
+s+='<text class="t" x="'+(W/2+20)+'" y="'+(H-4)+'" text-anchor="middle">Number of invoices</text><text class="t" transform="translate(12 '+(H/2-20)+') rotate(-90)" text-anchor="middle">Average spend per invoice</text><text x="'+(L+6)+'" y="26" class="t">Fewer, larger orders</text><text x="'+(W-10)+'" y="'+(H-60)+'" text-anchor="end" class="t">Frequent, smaller orders</text></svg>';$('sc').innerHTML=s})();
+(function(){var M=[['Dec 10',746723.61],['Jan',558448.56],['Feb',497026.41],['Mar',682013.98],['Apr',492367.84],['May',722094.10],['Jun',689977.23],['Jul',680156.99],['Aug',681386.46],['Sep',1017596.68],['Oct',1069368.23],['Nov',1456145.80],['Dec 11*',432701.06]],W=900,H=320,L=56,B=34,T=16,mx=1600000,x=function(i){return L+i*(W-L-16)/12},y=function(v){return T+(H-T-B)*(1-v/mx)};
+var s='<svg viewBox="0 0 '+W+' '+H+'"><rect x="'+x(9)+'" y="'+T+'" width="'+(x(11)-x(9))+'" height="'+(H-T-B)+'" fill="rgba(11,31,75,.07)"/>';
+[0,500000,1000000,1500000].forEach(function(v){s+='<line class="g" x1="'+L+'" x2="'+(W-8)+'" y1="'+y(v)+'" y2="'+y(v)+'"/><text x="'+(L-8)+'" y="'+(y(v)+4)+'" text-anchor="end">'+(v/1e6).toFixed(1)+'M</text>'});
+var p=M.map(function(m,i){return x(i)+','+y(m[1])});s+='<polyline class="ln" points="'+p.slice(0,12).join(' ')+'"/><polyline class="ln" style="stroke-dasharray:5 5" points="'+p.slice(11).join(' ')+'"/>';
+M.forEach(function(m,i){s+='<circle cx="'+x(i)+'" cy="'+y(m[1])+'" r="5" data-tip="'+m[0]+': '+f(m[1],2)+(i==12?' (partial month)':'')+'"/><text x="'+x(i)+'" y="'+(H-12)+'" text-anchor="middle">'+m[0]+'</text>'});
+s+='<text class="t" x="'+(x(11)-10)+'" y="'+(y(1456145.8)-4)+'" text-anchor="end" style="font-size:15px">Peak 1.46M</text><text x="'+(x(12)-6)+'" y="'+(y(432701)-12)+'" text-anchor="end">Data ends ~9 Dec</text></svg>';$('line').innerHTML=s})();
+var S=[].slice.call(document.querySelectorAll('.slide')),i=0,toc=$('toc'),tip=$('tip'),tb=$('tb');
+toc.innerHTML=S.map(function(s,k){return '<a href="#'+(k+1)+'" data-k="'+k+'"><span>'+(k+1)+'</span>'+s.querySelector('h1,h2').textContent+'</a>'}).join('');
+function go(k){i=Math.max(0,Math.min(S.length-1,k));S.forEach(function(s,j){s.classList.toggle('on',j==i)});S[i].scrollTop=0;$('ct').textContent=(i+1)+' / '+S.length;$('bar').style.width=((i+1)/S.length*100)+'%';[].forEach.call(toc.children,function(a,j){a.classList.toggle('cur',j==i)});history.replaceState(null,'','#'+(i+1))}
+$('pv').onclick=function(){go(i-1)};$('nx').onclick=function(){go(i+1)};tb.onclick=function(){tb.setAttribute('aria-expanded',toc.classList.toggle('open'))};
+toc.onclick=function(e){var a=e.target.closest('a');if(a){e.preventDefault();go(+a.dataset.k);toc.classList.remove('open');tb.setAttribute('aria-expanded',false)}};
+document.addEventListener('keydown',function(e){var k=e.key;if(k=='ArrowRight'||k=='PageDown'||(k==' '&&e.target==document.body)){e.preventDefault();go(i+1)}else if(k=='ArrowLeft'||k=='PageUp')go(i-1);else if(k=='Home')go(0);else if(k=='End')go(S.length-1);else if(k=='Escape')toc.classList.remove('open')});
+document.addEventListener('mousemove',function(e){var t=e.target.closest&&e.target.closest('[data-tip]');if(t){tip.textContent=t.getAttribute('data-tip');tip.style.display='block';tip.style.left=Math.min(e.clientX+14,innerWidth-270)+'px';tip.style.top=(e.clientY+14)+'px'}else tip.style.display='none'});
+var tx=null;document.addEventListener('touchstart',function(e){tx=e.touches[0].clientX},{passive:true});document.addEventListener('touchend',function(e){if(tx===null)return;var d=e.changedTouches[0].clientX-tx;if(Math.abs(d)>70)go(i+(d<0?1:-1));tx=null});
+go((parseInt(location.hash.slice(1))||1)-1);
+})();
+</script>
+</body>
+</html>
